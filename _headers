@@ -1,0 +1,4 @@
+/sw.js
+  Cache-Control: no-cache
+/data.js
+  Cache-Control: public, max-age=3600

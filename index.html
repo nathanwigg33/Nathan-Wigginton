@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chapter &amp; Verse: the daily Bible verse game</title>
+<meta name="description" content="Five KJV verses a day. Find each one on the shelf: testament, book, chapter, verse. Score out of 1000.">
+<meta property="og:title" content="Chapter &amp; Verse: the daily Bible verse game">
+<meta property="og:description" content="Five KJV verses a day. Can you find them? Score out of 1000.">
+<meta property="og:image" content="/og.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#1a120d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Chapter &amp; Verse">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a120d; --ink2:#241912; --leather:#2e2018;
+  --gold:#e3b860; --gold2:#f6dc9a; --gold3:#a8812f;
+  --parch:#f3e6c8; --parch2:#e6d2a6; --text:#f1e7d3; --muted:#b9a684;
+  --good:#7fc28a; --part:#e8c25a; --miss:#5a4a3c; --red:#d0644e;
+  --serif:"EB Garamond", Georgia, "Times New Roman", serif;
+  --display:"Cinzel", "Trajan Pro", Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--ink)}
+html,body{margin:0}
+body{min-height:100vh;
+  background-repeat:no-repeat;background:
+    radial-gradient(1200px 600px at 50% -200px, #4a3220 0%, transparent 70%),
+    radial-gradient(800px 500px at 50% 120%, #2b1c12 0%, transparent 70%),
+    var(--ink);
+  color:var(--text); font-family:var(--sans); min-height:100%;
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  overflow-x:hidden;
+}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.wrap{max-width:540px;margin:0 auto;padding:10px 14px 40px;position:relative}
+
+/* header */
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0 10px}
+.logo{font-family:var(--display);font-weight:900;font-size:22px;letter-spacing:.06em;line-height:1;
+  background:linear-gradient(180deg,var(--gold2),var(--gold) 55%,var(--gold3));-webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 1px 0 rgba(0,0,0,.2)}
+.logo .amp{font-family:var(--serif);font-style:italic;font-weight:400;font-size:26px;padding:0 2px}
+.sub{font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.hbtns{display:flex;gap:4px}
+.ib{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--gold);border:1px solid rgba(227,184,96,.25)}
+.ib:active{transform:scale(.94)}
+.ib svg{width:20px;height:20px}
+
+/* progress */
+.prog{display:flex;gap:6px;margin:4px 0 12px}
+.pip{flex:1;height:30px;border-radius:7px;border:1px solid rgba(227,184,96,.22);display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-size:12px;color:var(--muted);position:relative;overflow:hidden;background:rgba(255,255,255,.02)}
+.pip.cur{border-color:var(--gold);color:var(--gold2);box-shadow:0 0 0 1px var(--gold) inset,0 0 18px rgba(227,184,96,.25)}
+.pip.done{color:var(--ink);background:linear-gradient(180deg,var(--gold2),var(--gold));border-color:var(--gold);font-weight:700}
+.pip .fill{position:absolute;left:0;bottom:0;height:3px;background:var(--gold2)}
+
+/* verse card */
+.card{position:relative;border-radius:14px;padding:22px 22px 18px;color:#2a1c10;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,.55), transparent 60%),
+    radial-gradient(80% 60% at 0% 100%, rgba(160,110,40,.18), transparent 70%),
+    radial-gradient(80% 60% at 100% 100%, rgba(160,110,40,.18), transparent 70%),
+    linear-gradient(180deg,var(--parch),var(--parch2));
+  box-shadow:0 10px 30px rgba(0,0,0,.45), inset 0 0 0 1px rgba(120,80,30,.25), inset 0 0 40px rgba(120,80,30,.18)}
+.card::before{content:"";position:absolute;inset:7px;border:1px solid rgba(140,95,35,.35);border-radius:10px;pointer-events:none}
+.qmeta{display:flex;justify-content:space-between;align-items:center;font-family:var(--display);font-size:11px;letter-spacing:.14em;color:#7a5a2e;text-transform:uppercase}
+.diff{display:flex;gap:3px;align-items:center}
+.diff i{width:7px;height:7px;border-radius:50%;background:rgba(122,90,46,.25);display:block}
+.diff i.on{background:#9a6a24}
+.vtext{font-family:var(--serif);font-size:22px;line-height:1.42;margin:14px 2px 6px;text-wrap:pretty}
+.vtext::first-letter{font-family:var(--display);font-weight:700;font-size:2.35em;float:left;line-height:.9;padding:4px 7px 0 0;color:#8a2d1b}
+.vtext.long{font-size:19px}
+.vtext.xlong{font-size:17px}
+.kjv{font-size:11px;letter-spacing:.12em;color:#8a6a3c;text-align:right;font-family:var(--display)}
+
+/* guess readout */
+.readout{display:flex;align-items:center;justify-content:center;gap:8px;margin:16px 0 8px;min-height:40px;font-family:var(--display)}
+.slot{padding:7px 12px;border-radius:9px;border:1px dashed rgba(227,184,96,.35);color:var(--muted);font-size:15px;min-width:44px;text-align:center;transition:.2s}
+.slot.set{border-style:solid;border-color:var(--gold);color:var(--gold2);background:rgba(227,184,96,.08)}
+.slot.book{min-width:120px}
+.slot.active{box-shadow:0 0 0 3px rgba(227,184,96,.25)}
+.colon{color:var(--gold3);font-size:20px}
+.hint{text-align:center;font-size:13px;color:var(--muted);margin-bottom:8px;min-height:18px}
+
+/* shelf */
+.shelfwrap{position:relative;border-radius:12px;padding:10px 8px 6px;
+  background:linear-gradient(180deg,#2a1b12,#1f150f);box-shadow:inset 0 2px 14px rgba(0,0,0,.6), 0 0 0 1px rgba(227,184,96,.12)}
+.tlabel{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:11px;letter-spacing:.2em;color:var(--gold);margin:4px 4px 6px;text-transform:uppercase}
+.tlabel::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(227,184,96,.4),transparent)}
+.shelf{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:center;
+  --row:76px;
+  background:repeating-linear-gradient(180deg, transparent 0 calc(var(--row) - 9px), #6b4527 calc(var(--row) - 9px), #8a5a33 calc(var(--row) - 7px), #4a2f1b calc(var(--row) - 1px), #2a1b12 var(--row));
+  padding:0 2px;margin-bottom:6px}
+.slotb{height:var(--row);display:flex;align-items:flex-end;padding-bottom:9px}
+.spine{position:relative;display:flex;align-items:center;justify-content:center;margin:0 1px;border-radius:3px 3px 1px 1px;
+  writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);
+  font-family:var(--display);font-weight:700;font-size:9.5px;letter-spacing:.06em;color:rgba(255,236,196,.88);
+  box-shadow:inset 2px 0 0 rgba(255,255,255,.12), inset -3px 0 0 rgba(0,0,0,.28), 0 0 0 .5px rgba(0,0,0,.6);
+  transition:transform .18s cubic-bezier(.3,1.6,.5,1), box-shadow .2s, filter .2s;
+  background-image:linear-gradient(90deg, rgba(0,0,0,.25), rgba(255,255,255,.08) 35%, rgba(0,0,0,.05) 60%, rgba(0,0,0,.3));
+}
+.spine::before,.spine::after{content:"";position:absolute;left:2px;right:2px;height:2px;background:rgba(227,184,96,.7);border-radius:1px}
+.spine::before{top:6px}.spine::after{bottom:6px}
+.spine:hover{filter:brightness(1.15)}
+.spine.sel{transform:rotate(180deg) translateY(10px);filter:brightness(1.3);box-shadow:0 0 0 2px var(--gold2),0 0 18px rgba(246,220,154,.7)}
+.spine.dim{filter:saturate(.4) brightness(.55)}
+.spine.correct{filter:brightness(1.35);animation:glow 1.4s ease-in-out infinite;transform:rotate(180deg) translateY(12px)}
+.spine.wrong{box-shadow:0 0 0 2px var(--red);filter:brightness(1)}
+@keyframes glow{0%,100%{box-shadow:0 0 0 2px var(--gold2),0 0 14px 2px rgba(246,220,154,.6)}50%{box-shadow:0 0 0 2px #fff6d8,0 0 34px 8px rgba(246,220,154,.9)}}
+.slotb{position:relative}.pin{position:absolute;left:50%;transform:translateX(-50%);font-size:13px;line-height:1;z-index:2;filter:drop-shadow(0 1px 2px #000)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 10px;justify-content:center;font-size:10.5px;color:var(--muted);padding:2px 4px 4px}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend b{width:9px;height:9px;border-radius:2px;display:inline-block}
+
+/* pickers */
+.sheet{margin-top:12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(227,184,96,.18);padding:10px;display:none}
+.sheet.show{display:block;animation:rise .25s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sheethead{display:flex;justify-content:space-between;align-items:center;font-family:var(--display);font-size:12px;letter-spacing:.12em;color:var(--gold);margin:0 2px 8px;text-transform:uppercase}
+.sheethead small{font-family:var(--sans);letter-spacing:0;text-transform:none;color:var(--muted);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:5px;max-height:216px;overflow:auto;padding:2px;overscroll-behavior:contain}
+.num{height:38px;border-radius:8px;background:rgba(227,184,96,.07);border:1px solid rgba(227,184,96,.16);font-family:var(--display);font-size:14px;color:var(--text)}
+.num:active{transform:scale(.93)}
+.num.sel{background:linear-gradient(180deg,var(--gold2),var(--gold));color:var(--ink);font-weight:700;border-color:var(--gold2)}
+.go{display:block;width:100%;margin-top:14px;height:54px;border-radius:12px;font-family:var(--display);font-weight:700;letter-spacing:.14em;font-size:16px;
+  color:var(--ink);background:linear-gradient(180deg,var(--gold2),var(--gold) 60%,var(--gold3));box-shadow:0 6px 20px rgba(227,184,96,.25), inset 0 1px 0 rgba(255,255,255,.6);transition:.2s}
+.go:disabled{filter:grayscale(.8) brightness(.5);box-shadow:none;cursor:default}
+.go:not(:disabled):active{transform:translateY(1px) scale(.99)}
+.ghost{display:block;width:100%;margin-top:10px;height:46px;border-radius:12px;border:1px solid rgba(227,184,96,.35);color:var(--gold2);font-family:var(--display);letter-spacing:.12em;font-size:14px}
+
+/* reveal */
+.reveal{display:none;margin-top:14px;border-radius:14px;padding:16px;background:linear-gradient(180deg,#2c1e15,#21170f);border:1px solid rgba(227,184,96,.3);position:relative;overflow:hidden}
+.reveal.show{display:block;animation:rise .3s ease-out}
+.answer{text-align:center}
+.answer .lbl{font-size:11px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;font-family:var(--display)}
+.answer .ref{font-family:var(--display);font-weight:900;font-size:30px;color:var(--gold2);margin:4px 0 2px;text-shadow:0 0 24px rgba(227,184,96,.35)}
+.answer .yours{font-size:13px;color:var(--muted)}
+.answer .yours b{color:var(--text);font-weight:600}
+.stamp{position:absolute;right:10px;top:12px;transform:rotate(12deg) scale(2.2);opacity:0;font-family:var(--display);font-weight:900;font-size:14px;letter-spacing:.12em;
+  color:var(--gold2);border:2px solid var(--gold2);padding:4px 8px;border-radius:6px;text-shadow:0 0 10px rgba(246,220,154,.6);pointer-events:none}
+.stamp.on{animation:stamp .5s cubic-bezier(.2,1.6,.4,1) forwards}
+@keyframes stamp{to{opacity:1;transform:rotate(12deg) scale(1)}}
+.rows{margin:14px 0 4px;display:grid;gap:7px}
+.row{display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,.035);opacity:0;transform:translateX(-8px);transition:.3s}
+.row.in{opacity:1;transform:none}
+.row .dot{width:18px;height:18px;border-radius:5px;background:var(--miss)}
+.row.exact .dot{background:var(--good);box-shadow:0 0 12px rgba(127,194,138,.6)}
+.row.partial .dot{background:var(--part)}
+.row .what{font-size:14px}
+.row .what small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
+.row .pts{font-family:var(--display);font-weight:700;font-size:16px;color:var(--muted);min-width:56px;text-align:right}
+.row.exact .pts{color:var(--good)} .row.partial .pts{color:var(--part)}
+.qtotal{display:flex;justify-content:space-between;align-items:baseline;padding:10px 4px 0;border-top:1px solid rgba(227,184,96,.15);margin-top:8px}
+.qtotal span{font-family:var(--display);letter-spacing:.14em;font-size:12px;color:var(--muted)}
+.qtotal b{font-family:var(--display);font-size:28px;color:var(--gold2)}
+.qtotal b small{font-size:14px;color:var(--muted);font-weight:500}
+.ctx{display:block;text-align:center;font-size:13px;color:var(--gold);margin-top:10px;text-decoration:none}
+.float{position:fixed;pointer-events:none;font-family:var(--display);font-weight:900;color:var(--gold2);font-size:22px;text-shadow:0 2px 10px rgba(0,0,0,.6),0 0 16px rgba(246,220,154,.7);z-index:60;animation:floatup 1.1s ease-out forwards}
+@keyframes floatup{0%{opacity:0;transform:translate(-50%,0) scale(.6)}20%{opacity:1;transform:translate(-50%,-14px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-70px) scale(1)}}
+.flash{position:fixed;inset:0;pointer-events:none;z-index:55;background:radial-gradient(circle at 50% 40%,rgba(255,240,200,.55),transparent 60%);opacity:0}
+.flash.on{animation:flash .9s ease-out}
+@keyframes flash{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+
+/* final */
+.final{display:none;text-align:center}
+.final.show{display:block;animation:rise .4s ease-out}
+.medal{position:relative;width:230px;height:230px;margin:6px auto 4px}
+.medal svg{width:100%;height:100%;transform:rotate(-90deg)}
+.medal .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.medal .big{font-family:var(--display);font-weight:900;font-size:58px;line-height:1;color:var(--gold2);text-shadow:0 0 30px rgba(227,184,96,.4)}
+.medal .of{font-family:var(--display);font-size:14px;color:var(--muted);letter-spacing:.2em;margin-top:4px}
+.rank{font-family:var(--display);font-weight:700;font-size:24px;letter-spacing:.08em;color:var(--gold)}
+.rankq{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--muted);margin:6px 18px 14px;line-height:1.4}
+.fl{display:grid;gap:7px;text-align:left;margin:10px 0}
+.fr{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(227,184,96,.1)}
+.fr .n{font-family:var(--display);color:var(--gold);font-size:13px;width:18px}
+.fr .r{font-size:14px}
+.fr .r small{display:block;color:var(--muted);font-size:12px}
+.fr .s{font-family:var(--display);font-weight:700;color:var(--gold2);text-align:right}
+.fr .sq{font-size:12px;letter-spacing:1px;display:block}
+.statsrow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:14px 0}
+.stat{padding:10px 4px;border-radius:10px;background:rgba(255,255,255,.04);text-align:center}
+.stat b{display:block;font-family:var(--display);font-size:22px;color:var(--gold2)}
+.stat span{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.next{font-size:13px;color:var(--muted);margin-top:14px}
+.next b{font-family:var(--display);color:var(--text);letter-spacing:.06em}
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:var(--gold2);color:var(--ink);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;opacity:0;transition:.25s;z-index:80;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%)}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(10,6,4,.78);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:70;padding:16px}
+.modal.show{display:flex;animation:rise .2s}
+.mbox{max-width:460px;width:100%;max-height:88vh;overflow:auto;border-radius:16px;padding:20px 20px 16px;background:linear-gradient(180deg,#2d1f16,#1f150f);border:1px solid rgba(227,184,96,.3)}
+.mbox h2{font-family:var(--display);color:var(--gold2);margin:0 0 10px;font-size:20px;letter-spacing:.06em}
+.mbox p,.mbox li{font-size:14.5px;line-height:1.5;color:var(--text)}
+.mbox ul{padding-left:18px;margin:8px 0}
+.mbox table{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0}
+.mbox td{padding:6px 4px;border-bottom:1px solid rgba(227,184,96,.12)}
+.mbox td:last-child{text-align:right;font-family:var(--display);color:var(--gold2)}
+.mbox .close{float:right;color:var(--muted);font-size:24px;line-height:1;margin:-4px -4px 0 0}
+.hist{display:grid;gap:4px;margin:10px 0}
+.hb{display:grid;grid-template-columns:72px 1fr;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.hb div{height:16px;border-radius:4px;background:rgba(227,184,96,.6);min-width:4px;font-size:11px;color:var(--ink);padding:0 5px;line-height:16px;font-weight:700}
+canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:58}
+@media (max-width:380px){.vtext{font-size:20px}.vtext.long{font-size:18px}.vtext.xlong{font-size:16px}.logo{font-size:19px}.spine{font-size:8.5px}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div class="flash" id="flash"></div>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="logo">CHAPTER<span class="amp">&amp;</span>VERSE</div>
+      <div class="sub" id="sub">Daily · KJV</div>
+    </div>
+    <div class="hbtns">
+      <button class="ib" id="btnSound" aria-label="Toggle sound"></button>
+      <button class="ib" id="btnStats" aria-label="Your stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V4M19 20v-6"/></svg></button>
+      <button class="ib" id="btnHelp" aria-label="How to play"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.5v.6"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></button>
+    </div>
+  </header>
+
+  <div class="prog" id="prog"></div>
+
+  <section id="play">
+    <div class="card" id="card">
+      <div class="qmeta"><span id="qlabel">Verse 1</span><span class="diff" id="qdiff"></span></div>
+      <div class="vtext" id="vtext"></div>
+      <div class="kjv">King James Version</div>
+    </div>
+
+    <div class="readout">
+      <button class="slot book" id="slotB">Book</button>
+      <button class="slot" id="slotC">Ch</button><span class="colon">:</span>
+      <button class="slot" id="slotV">Vs</button>
+    </div>
+    <div class="hint" id="hint">Tap the book on the shelf where you think this verse lives.</div>
+
+    <div class="shelfwrap" id="shelfwrap">
+      <div class="tlabel">Old Testament</div>
+      <div class="shelf" id="shelfOT"></div>
+      <div class="tlabel">New Testament</div>
+      <div class="shelf" id="shelfNT"></div>
+      <div class="legend" id="legend"></div>
+    </div>
+
+    <div class="sheet" id="sheetC"><div class="sheethead"><span>Chapter</span><small id="chInfo"></small></div><div class="grid" id="gridC"></div></div>
+    <div class="sheet" id="sheetV"><div class="sheethead"><span>Verse</span><small id="vsInfo"></small></div><div class="grid" id="gridV"></div></div>
+
+    <button class="go" id="go" disabled>LOCK IT IN</button>
+
+    <div class="reveal" id="reveal">
+      <div class="stamp" id="stamp">BULLSEYE</div>
+      <div class="answer">
+        <div class="lbl">The verse is</div>
+        <div class="ref" id="ansRef"></div>
+        <div class="yours">You guessed <b id="ansYou"></b></div>
+      </div>
+      <div class="rows" id="rows"></div>
+      <div class="qtotal"><span>THIS VERSE</span><b id="qpts">0<small> / 200</small></b></div>
+      <a class="ctx" id="ctx" target="_blank" rel="noopener">Read it in context ↗</a>
+      <button class="go" id="next">NEXT VERSE</button>
+    </div>
+  </section>
+
+  <section class="final" id="final">
+    <div class="medal">
+      <svg viewBox="0 0 230 230">
+        <defs><linearGradient id="mg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6dc9a"/><stop offset=".6" stop-color="#e3b860"/><stop offset="1" stop-color="#a8812f"/></linearGradient></defs>
+        <circle cx="115" cy="115" r="100" fill="none" stroke="rgba(227,184,96,.12)" stroke-width="14"/>
+        <circle id="ring" cx="115" cy="115" r="100" fill="none" stroke="url(#mg)" stroke-width="14" stroke-linecap="round" stroke-dasharray="628.3" stroke-dashoffset="628.3"/>
+      </svg>
+      <div class="c"><div class="big" id="fScore">0</div><div class="of">OF 1000</div></div>
+    </div>
+    <div class="rank" id="fRank"></div>
+    <div class="rankq" id="fQuote"></div>
+    <button class="go" id="share">SHARE MY SCORE</button>
+    <div class="statsrow" id="fStats"></div>
+    <div class="fl" id="fList"></div>
+    <div class="next">Next five verses in <b id="countdown">--:--:--</b></div>
+  </section>
+</div>
+
+<div class="modal" id="mHelp"><div class="mbox">
+  <button class="close" data-close>&times;</button>
+  <h2>How to play</h2>
+  <p>Every day you get <b>five verses</b> from the King James Bible. They get harder, from verses most people know to deep cuts from the minor prophets.</p>
+  <p>Find each verse on the shelf. Pick the <b>book</b>, then the <b>chapter</b>, then the <b>verse</b>. Each verse is worth up to <b>200</b> points, so a perfect day is <b>1000</b>.</p>
+  <table>
+    <tr><td>Right testament</td><td>20</td></tr>
+    <tr><td>Right book <small style="color:var(--muted)">(partial credit if you're a few books away on the shelf)</small></td><td>80</td></tr>
+    <tr><td>Right chapter <small style="color:var(--muted)">(partial if close)</small></td><td>60</td></tr>
+    <tr><td>Right verse <small style="color:var(--muted)">(partial if close)</small></td><td>40</td></tr>
+  </table>
+  <p style="color:var(--muted);font-size:13px">You only earn chapter points if you found the right book, and verse points only if you found the right chapter. Everyone gets the same five verses each day, and a new set comes out at midnight.</p>
+  <button class="go" data-close>LET'S GO</button>
+</div></div>
+
+<div class="modal" id="mStats"><div class="mbox">
+  <button class="close" data-close>&times;</button>
+  <h2>Your record</h2>
+  <div class="statsrow" id="sStats"></div>
+  <div style="font-family:var(--display);font-size:12px;letter-spacing:.14em;color:var(--gold);margin-top:6px">SCORE SPREAD</div>
+  <div class="hist" id="sHist"></div>
+  <p style="color:var(--muted);font-size:12.5px">Your stats are saved on this device.</p>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script>
+(()=>{
+const D = window.CV_DATA, BOOKS = D.books, COUNTS = D.counts;
+const $ = id => document.getElementById(id);
+const ABBR = ["Gen","Exod","Lev","Num","Deut","Josh","Judg","Ruth","1 Sam","2 Sam","1 Kgs","2 Kgs","1 Chr","2 Chr","Ezra","Neh","Esth","Job","Ps","Prov","Eccl","Song","Isa","Jer","Lam","Ezek","Dan","Hos","Joel","Amos","Obad","Jonah","Mic","Nah","Hab","Zeph","Hag","Zech","Mal","Matt","Mark","Luke","John","Acts","Rom","1 Cor","2 Cor","Gal","Eph","Phil","Col","1 Thes","2 Thes","1 Tim","2 Tim","Titus","Phlm","Heb","Jas","1 Pet","2 Pet","1 Jn","2 Jn","3 Jn","Jude","Rev"];
+const GENRES = [
+  {n:"Law",       a:0, b:4,  c:"#7d2c22"},
+  {n:"History",   a:5, b:16, c:"#2f5138"},
+  {n:"Poetry",    a:17,b:21, c:"#2c3c66"},
+  {n:"Major Prophets",a:22,b:26,c:"#5d2c55"},
+  {n:"Minor Prophets",a:27,b:38,c:"#7a5228"},
+  {n:"Gospels",   a:39,b:42, c:"#9a3b1f"},
+  {n:"Acts",      a:43,b:43, c:"#245e60"},
+  {n:"Paul's Letters",a:44,b:56,c:"#3e3478"},
+  {n:"General Letters",a:57,b:64,c:"#55652c"},
+  {n:"Revelation",a:65,b:65, c:"#4a1418"},
+];
+const genreOf = b => GENRES.find(g=>b>=g.a&&b<=g.b);
+const TIERS = [
+  {name:"Sunday School"}, {name:"Small Group"}, {name:"Bible Study"}, {name:"Seminary"}, {name:"Scribe"}
+];
+const RANKS = [
+  [1000,"Apostle","“Well done, thou good and faithful servant.”  Matthew 25:21"],
+  [900,"Prophet","“Thy word is a lamp unto my feet, and a light unto my path.”  Psalm 119:105"],
+  [750,"Elder","“Study to shew thyself approved unto God.”  2 Timothy 2:15"],
+  [600,"Scribe","“Thy words were found, and I did eat them.”  Jeremiah 15:16"],
+  [450,"Disciple","“Seek, and ye shall find.”  Matthew 7:7"],
+  [300,"Pilgrim","“The path of the just is as the shining light.”  Proverbs 4:18"],
+  [150,"Seeker","“Ask, and it shall be given you.”  Matthew 7:7"],
+  [0,"Wanderer","“I have gone astray like a lost sheep; seek thy servant.”  Psalm 119:176"],
+];
+
+/* ---------- day & selection ---------- */
+const EPOCH = Date.UTC(2026,10,7);
+function todayNum(){ const n=new Date(); return Math.floor((Date.UTC(n.getFullYear(),n.getMonth(),n.getDate())-EPOCH)/864e5)+1; }
+const qp = new URLSearchParams(location.search);
+const PUZ = Math.max(1, parseInt(qp.get('day'))||todayNum());
+function rng(seed){ return ()=>{ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function permFor(tier,cycle,n){ const r=rng(tier*7919+cycle*104729+20261107); const a=[...Array(n).keys()]; for(let i=n-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function pickDay(p){
+  const used=new Set(), out=[];
+  D.tiers.forEach((pool,t)=>{
+    const n=pool.length, cycle=Math.floor((p-1)/n), pos=(p-1)%n;
+    for(let j=0;j<8;j++){
+      const v=pool[permFor(t,cycle+j*977,n)[pos]], key=v[0]+':'+v[1];
+      if(!used.has(key)||j===7){ used.add(key); out.push({b:v[0],c:v[1],v:v[2],t:v[3],tier:t}); break; }
+    }
+  });
+  return out;
+}
+const QS = pickDay(PUZ);
+
+/* ---------- scoring ---------- */
+function score(g,a){
+  const s={t:0,b:0,c:0,v:0, tq:'miss',bq:'miss',cq:'miss',vq:'miss', bd:Math.abs(g.b-a.b)};
+  const testa = x=>x<39?0:1;
+  if(testa(g.b)===testa(a.b)){s.t=20;s.tq='exact';}
+  if(g.b===a.b){ s.b=80; s.bq='exact';
+    const nC=COUNTS[a.b].length, dc=Math.abs(g.c-a.c);
+    if(dc===0){ s.c=60; s.cq='exact';
+      const nV=COUNTS[a.b][a.c-1], dv=Math.abs(g.v-a.v);
+      if(dv===0){s.v=40;s.vq='exact';}
+      else { const R=Math.max(3,Math.round(nV*.25)); s.v=Math.round(30*Math.max(0,1-dv/R)); if(s.v>0)s.vq='partial'; }
+    } else { const R=Math.max(3,Math.round(nC*.2)); s.c=Math.round(45*Math.max(0,1-dc/R)); if(s.c>0)s.cq='partial'; }
+  } else { s.b=Math.round(50*Math.max(0,1-s.bd/6)); if(s.b>0)s.bq='partial'; }
+  s.total=s.t+s.b+s.c+s.v; return s;
+}
+
+/* ---------- storage ---------- */
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}, set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const SKEY='cv_day_'+PUZ;
+let state = LS.get(SKEY,{answers:[]});
+let stats = LS.get('cv_stats',{history:{}});
+let soundOn = LS.get('cv_sound',true);
+
+/* ---------- sound ---------- */
+let AC=null;
+function ac(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){} } if(AC&&AC.state==='suspended')AC.resume(); return AC; }
+function tone(f,dur=.25,type='sine',vol=.15,when=0){ if(!soundOn)return; const c=ac(); if(!c)return; const t=c.currentTime+when;
+  const o=c.createOscillator(), g=c.createGain(); o.type=type; o.frequency.value=f;
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+.01); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t+dur+.05); }
+function bell(f,when=0,vol=.12){ tone(f,1.2,'sine',vol,when); tone(f*2.01,.8,'sine',vol*.35,when); tone(f*3.02,.5,'triangle',vol*.15,when); }
+const SFX={
+  tap:()=>tone(660,.06,'triangle',.06),
+  tick:(i)=>tone(520+i*90,.09,'triangle',.08),
+  good:()=>{[523.25,659.25,783.99].forEach((f,i)=>bell(f,i*.09,.1));},
+  bull:()=>{[523.25,659.25,783.99,1046.5].forEach((f,i)=>bell(f,i*.08,.12)); [1318.5,1568,2093].forEach((f,i)=>bell(f,.42+i*.06,.06)); },
+  meh:()=>{tone(196,.35,'sine',.12); tone(147,.45,'sine',.1,.12);},
+  fanfare:()=>{[392,523.25,659.25,783.99,1046.5].forEach((f,i)=>bell(f,i*.12,.11)); [523.25,659.25,783.99].forEach(f=>bell(f,.75,.09));}
+};
+function buzz(p){ try{navigator.vibrate&&navigator.vibrate(p)}catch(e){} }
+function drawSoundIcon(){ $('btnSound').innerHTML = soundOn
+  ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>'
+  : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>'; }
+
+/* ---------- confetti / light ---------- */
+const cv=$('fx'), cx=cv.getContext('2d'); let parts=[], raf=null;
+function sizeCv(){ const r=devicePixelRatio||1; cv.width=innerWidth*r; cv.height=innerHeight*r; cx.setTransform(r,0,0,r,0,0); }
+addEventListener('resize',sizeCv); sizeCv();
+function burst(x,y,n=90,power=1){
+  const cols=['#f6dc9a','#e3b860','#fff3cf','#c99a3c','#ffffff'];
+  for(let i=0;i<n;i++){ const a=Math.random()*Math.PI*2, sp=(2+Math.random()*6)*power;
+    parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-3*power,life:1,dec:.008+Math.random()*.012,s:2+Math.random()*4,c:cols[i%cols.length],rot:Math.random()*6,vr:(Math.random()-.5)*.3,shape:Math.random()<.35?'star':(Math.random()<.5?'rect':'dot')}); }
+  if(!raf) loop();
+}
+function star(x,y,r){ cx.beginPath(); for(let i=0;i<8;i++){const rr=i%2?r*.4:r, a=i*Math.PI/4; cx.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr);} cx.closePath(); cx.fill(); }
+function loop(){
+  cx.clearRect(0,0,innerWidth,innerHeight);
+  parts=parts.filter(p=>p.life>0);
+  for(const p of parts){ p.vy+=.12; p.vx*=.99; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.life-=p.dec;
+    cx.globalAlpha=Math.max(0,p.life); cx.fillStyle=p.c;
+    if(p.shape==='star'){ cx.shadowColor='#fff3cf'; cx.shadowBlur=8; star(p.x,p.y,p.s*1.6); cx.shadowBlur=0; }
+    else if(p.shape==='rect'){ cx.save(); cx.translate(p.x,p.y); cx.rotate(p.rot); cx.fillRect(-p.s,-p.s/2,p.s*2,p.s); cx.restore(); }
+    else { cx.beginPath(); cx.arc(p.x,p.y,p.s/1.5,0,7); cx.fill(); } }
+  cx.globalAlpha=1;
+  raf = parts.length? requestAnimationFrame(loop) : (cx.clearRect(0,0,innerWidth,innerHeight), null);
+}
+function flash(){ const f=$('flash'); f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); }
+function floatPts(el,text){ const r=el.getBoundingClientRect(); const d=document.createElement('div'); d.className='float'; d.textContent=text;
+  d.style.left=(r.left+r.width/2)+'px'; d.style.top=(r.top)+'px'; document.body.appendChild(d); setTimeout(()=>d.remove(),1200); }
+function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('on'),1800); }
+
+/* ---------- shelf ---------- */
+const spines=[];
+function buildShelf(){
+  for(let b=0;b<66;b++){
+    const n=COUNTS[b].length, w=Math.round(15+3.4*Math.log2(n+1)), h=46+((b*37)%17);
+    const slot=document.createElement('div'); slot.className='slotb';
+    const s=document.createElement('button'); s.className='spine'; s.style.width=w+'px'; s.style.height=h+'px';
+    s.style.backgroundColor=genreOf(b).c; s.textContent=ABBR[b]; s.setAttribute('aria-label',BOOKS[b]);
+    s.onclick=()=>chooseBook(b);
+    slot.appendChild(s); (b<39?$('shelfOT'):$('shelfNT')).appendChild(slot); spines[b]=s;
+  }
+  $('legend').innerHTML=GENRES.map(g=>`<span><b style="background:${g.c}"></b>${g.n}</span>`).join('');
+}
+
+/* ---------- play flow ---------- */
+let qi=0, guess={b:null,c:null,v:null}, locked=false;
+function renderProg(){
+  $('prog').innerHTML = QS.map((q,i)=>{ const a=state.answers[i]; const cls = a?'done':(i===qi&&!isDone()?'cur':'');
+    return `<div class="pip ${cls}">${a?a.s.total:(i+1)}</div>`; }).join('');
+}
+function isDone(){ return state.answers.length>=QS.length; }
+function loadQ(){
+  locked=false; guess={b:null,c:null,v:null};
+  const q=QS[qi];
+  $('qlabel').textContent=`Verse ${qi+1} · ${TIERS[q.tier].name}`;
+  $('qdiff').innerHTML=[0,1,2,3,4].map(i=>`<i class="${i<=q.tier?'on':''}"></i>`).join('');
+  const vt=$('vtext'); vt.textContent=q.t; vt.className='vtext'+(q.t.length>230?' xlong':q.t.length>150?' long':'');
+  spines.forEach(s=>{s.className='spine'; s.parentElement.querySelector('.pin')?.remove();});
+  $('reveal').classList.remove('show'); $('go').style.display='block';
+  $('sheetC').classList.remove('show'); $('sheetV').classList.remove('show');
+  $('shelfwrap').style.pointerEvents='';
+  updateReadout(); renderProg();
+  $('card').animate([{opacity:0,transform:'translateY(10px) scale(.98)'},{opacity:1,transform:'none'}],{duration:350,easing:'ease-out'});
+}
+function updateReadout(){
+  const sb=$('slotB'), sc=$('slotC'), sv=$('slotV');
+  sb.textContent = guess.b!=null?BOOKS[guess.b]:'Book'; sb.classList.toggle('set',guess.b!=null);
+  sc.textContent = guess.c??'Ch'; sc.classList.toggle('set',guess.c!=null);
+  sv.textContent = guess.v??'Vs'; sv.classList.toggle('set',guess.v!=null);
+  sb.classList.toggle('active',guess.b==null); sc.classList.toggle('active',guess.b!=null&&guess.c==null); sv.classList.toggle('active',guess.c!=null&&guess.v==null);
+  $('go').disabled = !(guess.b!=null&&guess.c!=null&&guess.v!=null);
+  $('hint').textContent = guess.b==null?'Tap the book on the shelf where you think this verse lives.'
+    : guess.c==null?`${BOOKS[guess.b]} it is. Now pick a chapter.` : guess.v==null?'Now pick the verse.' : 'Locked in? Tap a slot to change it.';
+}
+function chooseBook(b){
+  if(locked) return; SFX.tap(); buzz(8);
+  guess={b,c:null,v:null};
+  spines.forEach((s,i)=>s.classList.toggle('sel',i===b));
+  const n=COUNTS[b].length;
+  $('chInfo').textContent=`${BOOKS[b]} has ${n} chapter${n>1?'s':''}`;
+  $('gridC').innerHTML=''; for(let i=1;i<=n;i++){ const x=document.createElement('button'); x.className='num'; x.textContent=i; x.onclick=()=>chooseCh(i); $('gridC').appendChild(x); }
+  $('sheetV').classList.remove('show'); $('sheetC').classList.add('show');
+  if(n===1) chooseCh(1); else $('sheetC').scrollIntoView({behavior:'smooth',block:'nearest'});
+  updateReadout();
+}
+function chooseCh(c){
+  if(locked) return; SFX.tap(); guess.c=c; guess.v=null;
+  [...$('gridC').children].forEach((x,i)=>x.classList.toggle('sel',i+1===c));
+  const n=COUNTS[guess.b][c-1];
+  $('vsInfo').textContent=`${ABBR[guess.b]} ${c} has ${n} verses`;
+  $('gridV').innerHTML=''; for(let i=1;i<=n;i++){ const x=document.createElement('button'); x.className='num'; x.textContent=i; x.onclick=()=>chooseV(i); $('gridV').appendChild(x); }
+  $('sheetV').classList.add('show'); $('sheetV').scrollIntoView({behavior:'smooth',block:'nearest'});
+  updateReadout();
+}
+function chooseV(v){
+  if(locked) return; SFX.tap(); guess.v=v;
+  [...$('gridV').children].forEach((x,i)=>x.classList.toggle('sel',i+1===v));
+  updateReadout(); $('go').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+$('slotB').onclick=()=>{ if(!locked){ $('shelfwrap').scrollIntoView({behavior:'smooth',block:'center'}); } };
+$('slotC').onclick=()=>{ if(!locked&&guess.b!=null){ $('sheetC').classList.add('show'); $('sheetC').scrollIntoView({behavior:'smooth',block:'nearest'}); } };
+$('slotV').onclick=()=>{ if(!locked&&guess.c!=null){ $('sheetV').classList.add('show'); $('sheetV').scrollIntoView({behavior:'smooth',block:'nearest'}); } };
+
+const ref=(b,c,v)=>`${BOOKS[b]==='Psalms'?'Psalm':BOOKS[b]} ${c}:${v}`;
+$('go').onclick=()=>{
+  if($('go').disabled||locked) return; locked=true; ac();
+  const q=QS[qi], s=score(guess,q);
+  state.answers[qi]={g:{...guess},s}; LS.set(SKEY,state);
+  showReveal(q,guess,s,true);
+};
+function showReveal(q,g,s,animate){
+  $('sheetC').classList.remove('show'); $('sheetV').classList.remove('show'); $('go').style.display='none';
+  $('shelfwrap').style.pointerEvents='none';
+  spines.forEach((sp,i)=>{ sp.className='spine'+(i===q.b?' correct':(i===g.b?' wrong':' dim')); });
+  if(g.b!==q.b){ const pin=document.createElement('span'); pin.className='pin'; pin.textContent='📍'; pin.style.bottom=(9+spines[g.b].offsetHeight+1)+'px'; spines[g.b].parentElement.appendChild(pin); }
+  $('ansRef').textContent=ref(q.b,q.c,q.v);
+  $('ansYou').textContent=ref(g.b,g.c,g.v);
+  $('ctx').href=`https://www.biblegateway.com/passage/?search=${encodeURIComponent(BOOKS[q.b]+' '+q.c)}&version=KJV`;
+  const testName=q.b<39?'Old Testament':'New Testament';
+  const items=[
+    ['Testament', s.tq, s.t, 20, s.tq==='exact'?testName:`It's in the ${testName}`],
+    ['Book', s.bq, s.b, 80, s.bq==='exact'?BOOKS[q.b]:`${s.bd} book${s.bd>1?'s':''} away on the shelf`],
+    ['Chapter', s.cq, s.c, 60, g.b!==q.b?'Needs the right book':(s.cq==='exact'?`Chapter ${q.c}`:`${Math.abs(g.c-q.c)} chapter${Math.abs(g.c-q.c)>1?'s':''} off`)],
+    ['Verse', s.vq, s.v, 40, (g.b!==q.b||g.c!==q.c)?'Needs the right chapter':(s.vq==='exact'?`Verse ${q.v}`:`${Math.abs(g.v-q.v)} verse${Math.abs(g.v-q.v)>1?'s':''} off`)],
+  ];
+  $('rows').innerHTML=items.map(it=>`<div class="row ${it[1]}"><div class="dot"></div><div class="what">${it[0]}<small>${it[4]}</small></div><div class="pts">${animate?0:it[2]}<span style="font-size:11px;color:var(--muted)">/${it[3]}</span></div></div>`).join('');
+  $('stamp').className='stamp'; $('stamp').textContent = s.total===200?'BULLSEYE':(s.c===60?'SO CLOSE':(s.b===80?'RIGHT BOOK':''));
+  $('stamp').style.display=$('stamp').textContent?'':'none';
+  $('reveal').classList.add('show');
+  $('next').textContent = qi<QS.length-1?'NEXT VERSE':'SEE MY SCORE';
+  const rows=[...$('rows').children];
+  if(!animate){ rows.forEach(r=>r.classList.add('in')); $('qpts').innerHTML=`${s.total}<small> / 200</small>`; $('stamp').classList.add('on'); renderProg(); return; }
+  setTimeout(()=>$('reveal').scrollIntoView({behavior:'smooth',block:'start'}),60);
+  let run=0;
+  rows.forEach((r,i)=>setTimeout(()=>{
+    r.classList.add('in'); const it=items[i]; const pe=r.querySelector('.pts');
+    countUp(pe,it[2],380,v=>`${v}<span style="font-size:11px;color:var(--muted)">/${it[3]}</span>`);
+    run+=it[2]; countUp($('qpts'),run,380,v=>`${v}<small> / 200</small>`,run-it[2]);
+    if(it[1]==='exact'){ SFX.tick(i); buzz(12); if(i>=1) floatPts(r,'+'+it[2]); }
+    else if(it[1]==='partial'){ tone(440,.08,'triangle',.06); }
+  }, 450+i*420));
+  setTimeout(()=>{
+    const card=$('reveal').getBoundingClientRect();
+    if(s.total===200){ SFX.bull(); flash(); burst(innerWidth/2,card.top+60,160,1.3); setTimeout(()=>burst(innerWidth*.2,card.top+100,60,1),200); setTimeout(()=>burst(innerWidth*.8,card.top+100,60,1),350); buzz([30,40,60]); }
+    else if(s.c===60||s.b===80){ SFX.good(); burst(innerWidth/2,card.top+60,s.c===60?90:50,.9); buzz(25); }
+    else if(s.total>=20){ tone(330,.3,'sine',.08); }
+    else { SFX.meh(); $('reveal').classList.add('shake'); setTimeout(()=>$('reveal').classList.remove('shake'),400); }
+    if($('stamp').textContent) $('stamp').classList.add('on');
+    renderProg();
+  }, 450+4*420+120);
+}
+function countUp(el,to,dur,fmt,from=0){ const t0=performance.now(); const f=t=>{ const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3); el.innerHTML=fmt(Math.round(from+(to-from)*e)); if(k<1)requestAnimationFrame(f); }; requestAnimationFrame(f); }
+$('next').onclick=()=>{ SFX.tap(); if(qi<QS.length-1){ qi++; loadQ(); scrollTo({top:0,behavior:'smooth'}); } else showFinal(true); };
+
+/* ---------- final ---------- */
+const total=()=>state.answers.reduce((a,x)=>a+x.s.total,0);
+const sq=s=>[s.tq,s.bq,s.cq,s.vq].map(x=>x==='exact'?'🟩':x==='partial'?'🟨':'⬛').join('');
+function rankFor(t){ return RANKS.find(r=>t>=r[0]); }
+function recordStats(){ stats.history[PUZ]=total(); LS.set('cv_stats',stats); }
+function computeStats(){
+  const h=stats.history, keys=Object.keys(h).map(Number).sort((a,b)=>a-b), vals=keys.map(k=>h[k]);
+  let streak=0, best=0, run=0, prev=null;
+  keys.forEach(k=>{ run=(prev!==null&&k===prev+1)?run+1:1; best=Math.max(best,run); prev=k; });
+  const last=keys[keys.length-1]; streak = (last===todayNum()||last===todayNum()-1)?run:0;
+  if(qp.get('day')) streak=run;
+  return {played:keys.length, avg:vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0, best:vals.length?Math.max(...vals):0, streak, maxStreak:best, vals};
+}
+function statsHTML(st){ return [['Played',st.played],['Average',st.avg],['Best',st.best],['Streak',st.streak+(st.streak>=3?'🔥':'')]].map(x=>`<div class="stat"><b>${x[1]}</b><span>${x[0]}</span></div>`).join(''); }
+function showFinal(animate){
+  $('play').style.display='none'; $('final').classList.add('show'); recordStats(); renderProg();
+  const t=total(), r=rankFor(t), st=computeStats();
+  $('fRank').textContent=r[1]; $('fQuote').textContent=r[2];
+  $('fStats').innerHTML=statsHTML(st);
+  $('fList').innerHTML=QS.map((q,i)=>{ const a=state.answers[i];
+    return `<div class="fr"><div class="n">${i+1}</div><div class="r">${ref(q.b,q.c,q.v)}<small>You: ${ref(a.g.b,a.g.c,a.g.v)} · ${TIERS[q.tier].name}</small></div><div class="s">${a.s.total}<span class="sq">${sq(a.s)}</span></div></div>`; }).join('');
+  const ring=$('ring'), C=628.3;
+  if(animate){
+    scrollTo({top:0,behavior:'smooth'});
+    ring.style.transition='stroke-dashoffset 2.2s cubic-bezier(.2,.8,.2,1)'; requestAnimationFrame(()=>requestAnimationFrame(()=>ring.style.strokeDashoffset=C*(1-t/1000)));
+    countUp($('fScore'),t,2200,v=>v);
+    setTimeout(()=>{ SFX.fanfare(); flash(); const m=document.querySelector('.medal').getBoundingClientRect();
+      burst(m.left+m.width/2,m.top+m.height/2,t>=750?220:110,t>=750?1.5:1); if(t>=900){setTimeout(()=>burst(innerWidth*.15,innerHeight*.3,90,1.2),300);setTimeout(()=>burst(innerWidth*.85,innerHeight*.3,90,1.2),500);} buzz([40,60,80]); },2100);
+  } else { ring.style.strokeDashoffset=C*(1-t/1000); $('fScore').textContent=t; }
+  tickCountdown();
+}
+function shareText(){
+  const t=total();
+  return `Chapter & Verse #${PUZ} 📖\n${t}/1000 · ${rankFor(t)[1]}\n`+state.answers.map((a,i)=>`${i+1}️⃣ ${sq(a.s)} ${a.s.total}`).join('\n')+(/claude|anthropic|usercontent|localhost/.test(location.hostname)?'':`\n${location.origin}`);
+}
+$('share').onclick=async()=>{
+  const text=shareText(); SFX.tap();
+  if(navigator.share && /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)){ try{ await navigator.share({text}); return; }catch(e){ if(e.name==='AbortError')return; } }
+  try{ await navigator.clipboard.writeText(text); toast('Copied! Paste it into a text 📋'); }
+  catch(e){ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('Copied! Paste it into a text 📋'); }
+};
+function tickCountdown(){
+  const n=new Date(), m=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1), d=Math.max(0,m-n);
+  const h=String(Math.floor(d/36e5)).padStart(2,'0'), mi=String(Math.floor(d%36e5/6e4)).padStart(2,'0'), s=String(Math.floor(d%6e4/1e3)).padStart(2,'0');
+  $('countdown').textContent=`${h}:${mi}:${s}`;
+  if(d<1000 && !qp.get('day')) setTimeout(()=>location.reload(),1500); else setTimeout(tickCountdown,1000);
+}
+
+/* ---------- modals ---------- */
+function openM(id){ $(id).classList.add('show'); }
+document.querySelectorAll('.modal').forEach(m=>{ m.addEventListener('click',e=>{ if(e.target===m||e.target.hasAttribute('data-close')){ m.classList.remove('show'); LS.set('cv_seenhelp',true); } }); });
+$('btnHelp').onclick=()=>openM('mHelp');
+$('btnStats').onclick=()=>{
+  const st=computeStats(); $('sStats').innerHTML=statsHTML(st);
+  const buckets=[[0,199],[200,399],[400,599],[600,799],[800,949],[950,1000]], cnt=buckets.map(([a,b])=>st.vals.filter(v=>v>=a&&v<=b).length), mx=Math.max(1,...cnt);
+  $('sHist').innerHTML=buckets.map(([a,b],i)=>`<div class="hb"><span>${a}–${b}</span><div style="width:${Math.max(6,cnt[i]/mx*100)}%">${cnt[i]||''}</div></div>`).join('');
+  openM('mStats');
+};
+$('btnSound').onclick=()=>{ soundOn=!soundOn; LS.set('cv_sound',soundOn); drawSoundIcon(); if(soundOn)SFX.good(); };
+
+/* ---------- init ---------- */
+const dt=new Date(); $('sub').textContent=`No. ${PUZ} · ${dt.toLocaleDateString(undefined,{month:'short',day:'numeric'})} · KJV`;
+drawSoundIcon(); buildShelf();
+if(isDone()){ qi=QS.length-1; showFinal(false); }
+else {
+  qi=state.answers.length;
+  loadQ();
+  if(!LS.get('cv_seenhelp',false)) setTimeout(()=>openM('mHelp'),400);
+}
+if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register("sw.js").catch(()=>{});
+window.__CV={QS,score,pickDay};
+})();
+</script>
+</body>
+</html>
