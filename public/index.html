@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Chapter &amp; Verse: the daily Bible verse game</title>
-<meta name="description" content="Five KJV verses a day. Find each one on the shelf: testament, book, chapter, verse. Score out of 1000.">
+<meta name="description" content="Five Bible verses a day. Find each one on the shelf: testament, book, chapter, verse. Score out of 1000.">
 <meta property="og:title" content="Chapter &amp; Verse: the daily Bible verse game">
-<meta property="og:description" content="Five KJV verses a day. Can you find them? Score out of 1000.">
+<meta property="og:description" content="Five Bible verses a day. Can you find them? Score out of 1000.">
 <meta property="og:image" content="https://verse-find.nathanmwiggy.workers.dev/og.png">
 <meta property="og:url" content="https://verse-find.nathanmwiggy.workers.dev/">
 <meta property="og:type" content="website">
@@ -85,6 +85,18 @@ header{display:flex;align-items:center;justify-content:space-between;gap:8px;pad
 .vtext.xlong{font-size:17px}
 .kjv{font-size:11px;letter-spacing:.12em;color:#8a6a3c;text-align:right;font-family:var(--display)}
 
+/* hints */
+.hints{display:flex;gap:8px;margin:12px 0 0}
+.hbtn{flex:1;height:40px;border-radius:10px;border:1px solid rgba(227,184,96,.35);color:var(--gold2);font-size:13.5px;font-weight:600;background:rgba(227,184,96,.06);display:flex;align-items:center;justify-content:center;gap:6px}
+.hbtn small{color:var(--muted);font-weight:500}
+.hbtn:disabled{opacity:.38;cursor:default}
+.hbtn.used{background:rgba(227,184,96,.16);border-color:var(--gold);opacity:1}
+.hintbox{margin-top:8px;display:grid;gap:6px}
+.hintline{padding:10px 12px;border-radius:10px;background:rgba(227,184,96,.08);border-left:3px solid var(--gold);font-size:14px;line-height:1.4;animation:rise .25s ease-out}
+.hintline b{color:var(--gold2);font-family:var(--display);font-size:11px;letter-spacing:.14em;display:block;margin-bottom:2px}
+.vtext.loading{opacity:.5;font-style:italic}
+.vtext.loading::first-letter{font-size:1em;float:none;padding:0;color:inherit;font-family:inherit}
+.foot{margin-top:26px;font-size:11px;line-height:1.5;color:#8a7a60;text-align:center}
 /* guess readout */
 .readout{display:flex;align-items:center;justify-content:center;gap:8px;margin:16px 0 8px;min-height:40px;font-family:var(--display)}
 .slot{padding:7px 12px;border-radius:9px;border:1px dashed rgba(227,184,96,.35);color:var(--muted);font-size:15px;min-width:44px;text-align:center;transition:.2s}
@@ -227,7 +239,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
   <header>
     <div>
       <div class="logo">CHAPTER<span class="amp">&amp;</span>VERSE</div>
-      <div class="sub" id="sub">Daily · KJV</div>
+      <div class="sub" id="sub">Daily</div>
     </div>
     <div class="hbtns">
       <button class="ib" id="btnSound" aria-label="Toggle sound"></button>
@@ -242,8 +254,13 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
     <div class="card" id="card">
       <div class="qmeta"><span id="qlabel">Verse 1</span><span class="diff" id="qdiff"></span></div>
       <div class="vtext" id="vtext"></div>
-      <div class="kjv">King James Version</div>
+      <div class="kjv" id="tlabel">&nbsp;</div>
     </div>
+    <div class="hints">
+      <button class="hbtn" id="h1">💡 Book clue <small>−10</small></button>
+      <button class="hbtn" id="h2" disabled>💡 Context clue <small>−20</small></button>
+    </div>
+    <div class="hintbox" id="hintbox"></div>
 
     <div class="readout">
       <button class="slot book" id="slotB">Book</button>
@@ -297,10 +314,11 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
   </section>
 </div>
 
+<div class="wrap" style="padding-top:0"><div class="foot" id="foot"></div></div>
 <div class="modal" id="mHelp"><div class="mbox">
   <button class="close" data-close>&times;</button>
   <h2>How to play</h2>
-  <p>Every day you get <b>five verses</b> from the King James Bible. They get harder, from verses most people know to deep cuts from the minor prophets.</p>
+  <p>Every day you get <b>five verses</b>. Verses 1–3 are <b>easy</b>, verse 4 is <b>medium</b>, and verse 5 is <b>hard</b>.</p>
   <p>Find each verse on the shelf. Pick the <b>book</b>, then the <b>chapter</b>, then the <b>verse</b>. Each verse is worth up to <b>200</b> points, so a perfect day is <b>1000</b>.</p>
   <table>
     <tr><td>Right testament</td><td>20</td></tr>
@@ -308,6 +326,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
     <tr><td>Right chapter <small style="color:var(--muted)">(partial if close)</small></td><td>60</td></tr>
     <tr><td>Right verse <small style="color:var(--muted)">(partial if close)</small></td><td>40</td></tr>
   </table>
+  <p>Stuck? Tap <b>💡 Book clue</b> (−10) for who wrote it and where it sits in the Bible, then <b>💡 Context clue</b> (−20) for what's happening in that part of the story.</p>
   <p style="color:var(--muted);font-size:13px">You only earn chapter points if you found the right book, and verse points only if you found the right chapter. Everyone gets the same five verses each day, and a new set comes out at midnight.</p>
   <button class="go" data-close>LET'S GO</button>
 </div></div>
@@ -324,6 +343,8 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
 <div class="toast" id="toast"></div>
 
 <script src="data.js"></script>
+<script src="https://pkg.api.bible/fumsV3.min.js" async></script>
+<script>window.fumsData=window.fumsData||[];window.fums=window.fums||function(){window.fumsData.push(arguments);};</script>
 <script>
 (()=>{
 const D = window.CV_DATA, BOOKS = D.books, COUNTS = D.counts;
@@ -343,8 +364,11 @@ const GENRES = [
 ];
 const genreOf = b => GENRES.find(g=>b>=g.a&&b<=g.b);
 const TIERS = [
-  {name:"Sunday School"}, {name:"Small Group"}, {name:"Bible Study"}, {name:"Seminary"}, {name:"Scribe"}
+  {name:"Easy",lvl:1}, {name:"Easy",lvl:1}, {name:"Easy",lvl:1}, {name:"Medium",lvl:2}, {name:"Hard",lvl:3}
 ];
+const HINT_COST=[10,20];
+const NKJV_NOTICE="Scripture taken from the New King James Version®. Copyright © 1982 by Thomas Nelson. Used by permission. All rights reserved.";
+const KJV_NOTICE="Scripture from the King James Version (public domain).";
 const RANKS = [
   [1000,"Apostle","“Well done, thou good and faithful servant.”  Matthew 25:21"],
   [900,"Prophet","“Thy word is a lamp unto my feet, and a light unto my path.”  Psalm 119:105"],
@@ -374,7 +398,7 @@ function pickDay(p){
   });
   return out;
 }
-const QS = pickDay(PUZ);
+let QS = pickDay(PUZ).map(q=>({...q,tr:'KJV'}));
 
 /* ---------- scoring ---------- */
 function score(g,a){
@@ -472,8 +496,11 @@ function loadQ(){
   locked=false; guess={b:null,c:null,v:null};
   const q=QS[qi];
   $('qlabel').textContent=`Verse ${qi+1} · ${TIERS[q.tier].name}`;
-  $('qdiff').innerHTML=[0,1,2,3,4].map(i=>`<i class="${i<=q.tier?'on':''}"></i>`).join('');
+  $('qdiff').innerHTML=[1,2,3].map(i=>`<i class="${i<=TIERS[q.tier].lvl?'on':''}"></i>`).join('');
   const vt=$('vtext'); vt.textContent=q.t; vt.className='vtext'+(q.t.length>230?' xlong':q.t.length>150?' long':'');
+  $('tlabel').textContent = q.tr==='NKJV'?'New King James Version':'King James Version';
+  if(q.fums) trackFums(q.fums);
+  renderHints();
   spines.forEach(s=>{s.className='spine'; s.parentElement.querySelector('.pin')?.remove();});
   $('reveal').classList.remove('show'); $('go').style.display='block';
   $('sheetC').classList.remove('show'); $('sheetV').classList.remove('show');
@@ -520,11 +547,31 @@ $('slotB').onclick=()=>{ if(!locked){ $('shelfwrap').scrollIntoView({behavior:'s
 $('slotC').onclick=()=>{ if(!locked&&guess.b!=null){ $('sheetC').classList.add('show'); $('sheetC').scrollIntoView({behavior:'smooth',block:'nearest'}); } };
 $('slotV').onclick=()=>{ if(!locked&&guess.c!=null){ $('sheetV').classList.add('show'); $('sheetV').scrollIntoView({behavior:'smooth',block:'nearest'}); } };
 
+/* ---------- hints ---------- */
+function curHints(){ state.pending=state.pending||{}; return state.pending[qi]||0; }
+function renderHints(){
+  const n=locked?(state.answers[qi]?.h||0):curHints(), q=QS[qi];
+  $('h1').disabled=locked||n>=1; $('h2').disabled=locked||n!==1;
+  $('h1').classList.toggle('used',n>=1); $('h2').classList.toggle('used',n>=2);
+  const lines=[];
+  if(n>=1) lines.push(`<div class="hintline"><b>BOOK CLUE</b>${D.bookHints[q.b]}</div>`);
+  if(n>=2) lines.push(`<div class="hintline"><b>CONTEXT CLUE</b>${D.chHints[q.b+':'+q.c]||'No context clue for this one.'}</div>`);
+  $('hintbox').innerHTML=lines.join('');
+}
+function takeHint(k){ if(locked||curHints()!==k-1) return; SFX.tap(); buzz(10); state.pending[qi]=k; LS.set(SKEY,state); renderHints(); floatPts($('h'+k),'−'+HINT_COST[k-1]); }
+$('h1').onclick=()=>takeHint(1); $('h2').onclick=()=>takeHint(2);
+const hintPenalty=n=>HINT_COST.slice(0,n).reduce((a,b)=>a+b,0);
+
+/* ---------- FUMS (required by API.Bible) ---------- */
+const fumsSent=new Set();
+function trackFums(tok){ if(!tok||fumsSent.has(tok))return; fumsSent.add(tok); try{ window.fums&&window.fums('trackView',tok); }catch(e){} }
+
 const ref=(b,c,v)=>`${BOOKS[b]==='Psalms'?'Psalm':BOOKS[b]} ${c}:${v}`;
 $('go').onclick=()=>{
   if($('go').disabled||locked) return; locked=true; ac();
-  const q=QS[qi], s=score(guess,q);
-  state.answers[qi]={g:{...guess},s}; LS.set(SKEY,state);
+  const q=QS[qi], s=score(guess,q), h=curHints();
+  s.raw=s.total; s.pen=Math.min(s.raw,hintPenalty(h)); s.total=s.raw-s.pen;
+  state.answers[qi]={g:{...guess},s,h}; LS.set(SKEY,state); renderHints();
   showReveal(q,guess,s,true);
 };
 function showReveal(q,g,s,animate){
@@ -534,7 +581,7 @@ function showReveal(q,g,s,animate){
   if(g.b!==q.b){ const pin=document.createElement('span'); pin.className='pin'; pin.textContent='📍'; pin.style.bottom=(9+spines[g.b].offsetHeight+1)+'px'; spines[g.b].parentElement.appendChild(pin); }
   $('ansRef').textContent=ref(q.b,q.c,q.v);
   $('ansYou').textContent=ref(g.b,g.c,g.v);
-  $('ctx').href=`https://www.biblegateway.com/passage/?search=${encodeURIComponent(BOOKS[q.b]+' '+q.c)}&version=KJV`;
+  $('ctx').href=`https://www.biblegateway.com/passage/?search=${encodeURIComponent(BOOKS[q.b]+' '+q.c)}&version=${q.tr==='NKJV'?'NKJV':'KJV'}`;
   const testName=q.b<39?'Old Testament':'New Testament';
   const items=[
     ['Testament', s.tq, s.t, 20, s.tq==='exact'?testName:`It's in the ${testName}`],
@@ -542,8 +589,10 @@ function showReveal(q,g,s,animate){
     ['Chapter', s.cq, s.c, 60, g.b!==q.b?'Needs the right book':(s.cq==='exact'?`Chapter ${q.c}`:`${Math.abs(g.c-q.c)} chapter${Math.abs(g.c-q.c)>1?'s':''} off`)],
     ['Verse', s.vq, s.v, 40, (g.b!==q.b||g.c!==q.c)?'Needs the right chapter':(s.vq==='exact'?`Verse ${q.v}`:`${Math.abs(g.v-q.v)} verse${Math.abs(g.v-q.v)>1?'s':''} off`)],
   ];
-  $('rows').innerHTML=items.map(it=>`<div class="row ${it[1]}"><div class="dot"></div><div class="what">${it[0]}<small>${it[4]}</small></div><div class="pts">${animate?0:it[2]}<span style="font-size:11px;color:var(--muted)">/${it[3]}</span></div></div>`).join('');
-  $('stamp').className='stamp'; $('stamp').textContent = s.total===200?'BULLSEYE':(s.c===60?'SO CLOSE':(s.b===80?'RIGHT BOOK':''));
+  const hn=(state.answers[qi]&&state.answers[qi].h)||0;
+  if(s.pen) items.push(['Hints used','hint',-s.pen,'',`${hn} hint${hn>1?'s':''} taken`]);
+  $('rows').innerHTML=items.map(it=>`<div class="row ${it[1]}"><div class="dot"></div><div class="what">${it[0]}<small>${it[4]}</small></div><div class="pts">${it[1]==='hint'?'−'+(-it[2]):(animate?0:it[2])}${it[3]?`<span style="font-size:11px;color:var(--muted)">/${it[3]}</span>`:''}</div></div>`).join('');
+  $('stamp').className='stamp'; $('stamp').textContent = (s.raw??s.total)===200&&!s.pen?'BULLSEYE':(s.raw??s.total)===200?'NAILED IT':(s.c===60?'SO CLOSE':(s.b===80?'RIGHT BOOK':''));
   $('stamp').style.display=$('stamp').textContent?'':'none';
   $('reveal').classList.add('show');
   $('next').textContent = qi<QS.length-1?'NEXT VERSE':'SEE MY SCORE';
@@ -553,27 +602,27 @@ function showReveal(q,g,s,animate){
   let run=0;
   rows.forEach((r,i)=>setTimeout(()=>{
     r.classList.add('in'); const it=items[i]; const pe=r.querySelector('.pts');
-    countUp(pe,it[2],380,v=>`${v}<span style="font-size:11px;color:var(--muted)">/${it[3]}</span>`);
+    if(it[1]!=='hint') countUp(pe,it[2],380,v=>`${v}<span style="font-size:11px;color:var(--muted)">/${it[3]}</span>`);
     run+=it[2]; countUp($('qpts'),run,380,v=>`${v}<small> / 200</small>`,run-it[2]);
     if(it[1]==='exact'){ SFX.tick(i); buzz(12); if(i>=1) floatPts(r,'+'+it[2]); }
     else if(it[1]==='partial'){ tone(440,.08,'triangle',.06); }
   }, 450+i*420));
   setTimeout(()=>{
     const card=$('reveal').getBoundingClientRect();
-    if(s.total===200){ SFX.bull(); flash(); burst(innerWidth/2,card.top+60,160,1.3); setTimeout(()=>burst(innerWidth*.2,card.top+100,60,1),200); setTimeout(()=>burst(innerWidth*.8,card.top+100,60,1),350); buzz([30,40,60]); }
+    if((s.raw??s.total)===200){ SFX.bull(); flash(); burst(innerWidth/2,card.top+60,160,1.3); setTimeout(()=>burst(innerWidth*.2,card.top+100,60,1),200); setTimeout(()=>burst(innerWidth*.8,card.top+100,60,1),350); buzz([30,40,60]); }
     else if(s.c===60||s.b===80){ SFX.good(); burst(innerWidth/2,card.top+60,s.c===60?90:50,.9); buzz(25); }
     else if(s.total>=20){ tone(330,.3,'sine',.08); }
     else { SFX.meh(); $('reveal').classList.add('shake'); setTimeout(()=>$('reveal').classList.remove('shake'),400); }
     if($('stamp').textContent) $('stamp').classList.add('on');
     renderProg();
-  }, 450+4*420+120);
+  }, 450+items.length*420+120);
 }
 function countUp(el,to,dur,fmt,from=0){ const t0=performance.now(); const f=t=>{ const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3); el.innerHTML=fmt(Math.round(from+(to-from)*e)); if(k<1)requestAnimationFrame(f); }; requestAnimationFrame(f); }
 $('next').onclick=()=>{ SFX.tap(); if(qi<QS.length-1){ qi++; loadQ(); scrollTo({top:0,behavior:'smooth'}); } else showFinal(true); };
 
 /* ---------- final ---------- */
 const total=()=>state.answers.reduce((a,x)=>a+x.s.total,0);
-const sq=s=>[s.tq,s.bq,s.cq,s.vq].map(x=>x==='exact'?'🟩':x==='partial'?'🟨':'⬛').join('');
+const sq=s=>[s.tq,s.bq,s.cq,s.vq].map(x=>x==='exact'?'🟩':x==='partial'?'🟨':'⬛').join('')+(s.pen?'💡':'');
 function rankFor(t){ return RANKS.find(r=>t>=r[0]); }
 function recordStats(){ stats.history[PUZ]=total(); LS.set('cv_stats',stats); }
 function computeStats(){
@@ -604,7 +653,7 @@ function showFinal(animate){
 }
 function shareText(){
   const t=total();
-  return `Chapter & Verse #${PUZ} 📖\n${t}/1000 · ${rankFor(t)[1]}\n`+state.answers.map((a,i)=>`${i+1}️⃣ ${sq(a.s)} ${a.s.total}`).join('\n')+(/claude|anthropic|usercontent|localhost/.test(location.hostname)?'':`\n${location.origin}`);
+  return `Chapter & Verse #${PUZ} 📖\n${t}/1000 · ${rankFor(t)[1]}\n\n`+state.answers.map((a,i)=>`${i+1}️⃣ ${sq(a.s)} ${a.s.total}`).join('\n')+`\n\n${location.host}`;
 }
 $('share').onclick=async()=>{
   const text=shareText(); SFX.tap();
@@ -632,16 +681,35 @@ $('btnStats').onclick=()=>{
 $('btnSound').onclick=()=>{ soundOn=!soundOn; LS.set('cv_sound',soundOn); drawSoundIcon(); if(soundOn)SFX.good(); };
 
 /* ---------- init ---------- */
-const dt=new Date(); $('sub').textContent=`No. ${PUZ} · ${dt.toLocaleDateString(undefined,{month:'short',day:'numeric'})} · KJV`;
+const dt=new Date(); $('sub').textContent=`No. ${PUZ} · ${dt.toLocaleDateString(undefined,{month:'short',day:'numeric'})}`;
 drawSoundIcon(); buildShelf();
-if(isDone()){ qi=QS.length-1; showFinal(false); }
-else {
-  qi=state.answers.length;
-  loadQ();
-  if(!LS.get('cv_seenhelp',false)) setTimeout(()=>openM('mHelp'),400);
+async function loadVerses(){
+  const cached=LS.get('cv_text_'+PUZ,null);
+  if(cached&&cached.length===5) return cached;
+  try{
+    const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),6000);
+    const r=await fetch('/api/day?d='+PUZ,{signal:ctl.signal}); clearTimeout(to);
+    if(!r.ok) throw 0; const j=await r.json();
+    const out=j.verses.map(v=>({b:v.b,c:v.c,v:v.v,tier:v.tier,t:v.text,tr:'NKJV',fums:v.fumsToken}));
+    if(out.length!==5||out.some(x=>!x.t)) throw 0;
+    LS.set('cv_text_'+PUZ,out.map(x=>({...x,fums:null}))); return out;
+  }catch(e){ return null; }
 }
+(async()=>{
+  const vt=$('vtext'); vt.textContent='Opening the scroll…'; vt.className='vtext loading';
+  const remote=await loadVerses();
+  if(remote) QS=remote;
+  window.__CV.QS=QS;
+  $('foot').textContent = QS[0].tr==='NKJV'?NKJV_NOTICE:KJV_NOTICE;
+  if(isDone()){ qi=QS.length-1; showFinal(false); }
+  else {
+    qi=state.answers.length;
+    loadQ();
+    if(!LS.get('cv_seenhelp',false)) setTimeout(()=>openM('mHelp'),400);
+  }
+})();
 if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register("sw.js").catch(()=>{});
-window.__CV={QS,score,pickDay};
+window.__CV={QS,score,pickDay,shareText:()=>shareText()};
 })();
 </script>
 </body>
