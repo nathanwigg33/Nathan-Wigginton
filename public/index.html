@@ -660,7 +660,7 @@ function showFinal(animate){
 }
 function shareText(){
   const t=total();
-  return `WhereInTheWord #${PUZ} 📖\nFinal score: ${t}/1000 · ${rankFor(t)[1]}\n${location.origin}\n\n`+state.answers.map((a,i)=>`${i+1}️⃣ ${sq(a.s)} ${a.s.total}`).join('\n')+`\n\n(Note: To make this an app on your phone, tap the 3 dots in the bottom right, tap Share, then Add to Home Screen)`;
+  return `WhereInTheWord #${PUZ} 📖\nFinal score: ${t}/1000 · ${rankFor(t)[1]}\n${location.origin}\n\n`+state.answers.map((a,i)=>`${i+1}️⃣ ${sq(a.s)} ${a.s.total}`).join('\n');
 }
 $('share').onclick=async()=>{
   const text=shareText(); SFX.tap();
