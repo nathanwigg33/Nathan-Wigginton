@@ -549,19 +549,23 @@ $('slotV').onclick=()=>{ if(!locked&&guess.c!=null){ $('sheetV').classList.add('
 
 /* ---------- hints ---------- */
 function bookClue(q){ const a=D.bookHints[q.b]; if(typeof a==='string') return a; return a[(q.b*31+q.c*7+q.v*13)%a.length]; }
-function curHints(){ state.pending=state.pending||{}; return state.pending[qi]||0; }
+// Hints are a bitmask: 1 = book clue, 2 = context clue. Either can be taken in any order.
+const countToMask=n=>n>=2?3:n>=1?1:0; // older saves stored a count
+function curHints(){ state.hm=state.hm||{}; if(state.hm[qi]==null&&state.pending&&state.pending[qi]) state.hm[qi]=countToMask(state.pending[qi]); return state.hm[qi]||0; }
+function answerMask(a){ return a?(a.hm!=null?a.hm:countToMask(a.h||0)):0; }
 function renderHints(){
-  const n=locked?(state.answers[qi]?.h||0):curHints(), q=QS[qi];
-  $('h1').disabled=locked||n>=1; $('h2').disabled=locked||n!==1;
-  $('h1').classList.toggle('used',n>=1); $('h2').classList.toggle('used',n>=2);
+  const m=locked?answerMask(state.answers[qi]):curHints(), q=QS[qi];
+  $('h1').disabled=locked||!!(m&1); $('h2').disabled=locked||!!(m&2);
+  $('h1').classList.toggle('used',!!(m&1)); $('h2').classList.toggle('used',!!(m&2));
   const lines=[];
-  if(n>=1) lines.push(`<div class="hintline"><b>BOOK CLUE</b>${bookClue(q)}</div>`);
-  if(n>=2) lines.push(`<div class="hintline"><b>CONTEXT CLUE</b>${D.chHints[q.b+':'+q.c]||'No context clue for this one.'}</div>`);
+  if(m&1) lines.push(`<div class="hintline"><b>BOOK CLUE</b>${bookClue(q)}</div>`);
+  if(m&2) lines.push(`<div class="hintline"><b>CONTEXT CLUE</b>${D.chHints[q.b+':'+q.c]||'No context clue for this one.'}</div>`);
   $('hintbox').innerHTML=lines.join('');
 }
-function takeHint(k){ if(locked||curHints()!==k-1) return; SFX.tap(); buzz(10); state.pending[qi]=k; LS.set(SKEY,state); renderHints(); floatPts($('h'+k),'−'+HINT_COST[k-1]); }
+function takeHint(k){ const bit=k===1?1:2, m=curHints(); if(locked||(m&bit)) return; SFX.tap(); buzz(10); state.hm[qi]=m|bit; LS.set(SKEY,state); renderHints(); floatPts($('h'+k),'−'+HINT_COST[k-1]); }
 $('h1').onclick=()=>takeHint(1); $('h2').onclick=()=>takeHint(2);
-const hintPenalty=n=>HINT_COST.slice(0,n).reduce((a,b)=>a+b,0);
+const hintPenalty=m=>((m&1)?HINT_COST[0]:0)+((m&2)?HINT_COST[1]:0);
+const hintCount=m=>((m&1)?1:0)+((m&2)?1:0);
 
 /* ---------- FUMS (required by API.Bible) ---------- */
 const fumsSent=new Set();
@@ -572,7 +576,7 @@ $('go').onclick=()=>{
   if($('go').disabled||locked) return; locked=true; ac();
   const q=QS[qi], s=score(guess,q), h=curHints();
   s.raw=s.total; s.pen=Math.min(s.raw,hintPenalty(h)); s.total=s.raw-s.pen;
-  state.answers[qi]={g:{...guess},s,h}; LS.set(SKEY,state); renderHints();
+  state.answers[qi]={g:{...guess},s,hm:h}; LS.set(SKEY,state); renderHints();
   showReveal(q,guess,s,true);
 };
 function showReveal(q,g,s,animate){
@@ -590,8 +594,8 @@ function showReveal(q,g,s,animate){
     ['Chapter', s.cq, s.c, 60, g.b!==q.b?'Needs the right book':(s.cq==='exact'?`Chapter ${q.c}`:`${Math.abs(g.c-q.c)} chapter${Math.abs(g.c-q.c)>1?'s':''} off`)],
     ['Verse', s.vq, s.v, 40, (g.b!==q.b||g.c!==q.c)?'Needs the right chapter':(s.vq==='exact'?`Verse ${q.v}`:`${Math.abs(g.v-q.v)} verse${Math.abs(g.v-q.v)>1?'s':''} off`)],
   ];
-  const hn=(state.answers[qi]&&state.answers[qi].h)||0;
-  if(s.pen) items.push(['Hints used','hint',-s.pen,'',`${hn} hint${hn>1?'s':''} taken`]);
+  const hm=answerMask(state.answers[qi]), hn=hintCount(hm), hwhich=hm===3?'Book + context clues':hm===2?'Context clue':'Book clue';
+  if(s.pen) items.push(['Hints used','hint',-s.pen,'',hwhich]);
   $('rows').innerHTML=items.map(it=>`<div class="row ${it[1]}"><div class="dot"></div><div class="what">${it[0]}<small>${it[4]}</small></div><div class="pts">${it[1]==='hint'?'−'+(-it[2]):(animate?0:it[2])}${it[3]?`<span style="font-size:11px;color:var(--muted)">/${it[3]}</span>`:''}</div></div>`).join('');
   $('stamp').className='stamp'; $('stamp').textContent = (s.raw??s.total)===200&&!s.pen?'BULLSEYE':(s.raw??s.total)===200?'NAILED IT':(s.c===60?'SO CLOSE':(s.b===80?'RIGHT BOOK':''));
   $('stamp').style.display=$('stamp').textContent?'':'none';
