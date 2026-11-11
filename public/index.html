@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Chapter &amp; Verse: the daily Bible verse game</title>
+<title>WhereInTheWord: the daily Bible verse game</title>
 <meta name="description" content="Five Bible verses a day. Find each one on the shelf: testament, book, chapter, verse. Score out of 1000.">
-<meta property="og:title" content="Chapter &amp; Verse: the daily Bible verse game">
+<meta property="og:title" content="WhereInTheWord: the daily Bible verse game">
 <meta property="og:description" content="Five Bible verses a day. Can you find them? Score out of 1000.">
 <meta property="og:image" content="https://verse-find.nathanmwiggy.workers.dev/og.png">
 <meta property="og:url" content="https://verse-find.nathanmwiggy.workers.dev/">
@@ -14,7 +14,7 @@
 <meta name="theme-color" content="#1a120d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Chapter &amp; Verse">
+<meta name="apple-mobile-web-app-title" content="WhereInTheWord">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -48,7 +48,9 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 
 /* header */
 header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0 10px}
-.logo{font-family:var(--display);font-weight:900;font-size:22px;letter-spacing:.06em;line-height:1;
+.brand{display:flex;align-items:center;gap:10px}.brand img{width:40px;height:40px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.5),0 0 0 1px rgba(227,184,96,.3)}
+.logo .lw{color:var(--gold2);-webkit-text-fill-color:var(--gold2)}
+.logo{font-family:var(--display);font-weight:900;font-size:19px;letter-spacing:.02em;line-height:1;
   background:linear-gradient(180deg,var(--gold2),var(--gold) 55%,var(--gold3));-webkit-background-clip:text;background-clip:text;color:transparent;
   text-shadow:0 1px 0 rgba(0,0,0,.2)}
 .logo .amp{font-family:var(--serif);font-style:italic;font-weight:400;font-size:26px;padding:0 2px}
@@ -228,7 +230,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:8px;pad
 .hb{display:grid;grid-template-columns:72px 1fr;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
 .hb div{height:16px;border-radius:4px;background:rgba(227,184,96,.6);min-width:4px;font-size:11px;color:var(--ink);padding:0 5px;line-height:16px;font-weight:700}
 canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:58}
-@media (max-width:380px){.vtext{font-size:20px}.vtext.long{font-size:18px}.vtext.xlong{font-size:16px}.logo{font-size:19px}.spine{font-size:8.5px}}
+@media (max-width:380px){.vtext{font-size:20px}.vtext.long{font-size:18px}.vtext.xlong{font-size:16px}.logo{font-size:16px}.spine{font-size:8.5px}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
 </style>
 </head>
@@ -238,9 +240,9 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
 <div class="wrap">
   <header>
     <div>
-      <div class="logo">CHAPTER<span class="amp">&amp;</span>VERSE</div>
+      <div class="brand"><img src="logo-96.png" alt="" width="40" height="40"><div><div class="logo">Where<span class="lw">In</span>The<span class="lw">Word</span></div>
       <div class="sub" id="sub">Daily</div>
-    </div>
+    </div></div></div>
     <div class="hbtns">
       <button class="ib" id="btnSound" aria-label="Toggle sound"></button>
       <button class="ib" id="btnStats" aria-label="Your stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V4M19 20v-6"/></svg></button>
@@ -658,7 +660,7 @@ function showFinal(animate){
 }
 function shareText(){
   const t=total();
-  return `Chapter & Verse #${PUZ} 📖\nFinal score: ${t}/1000 · ${rankFor(t)[1]}\n${location.origin}\n\n`+state.answers.map((a,i)=>`${i+1}️⃣ ${sq(a.s)} ${a.s.total}`).join('\n');
+  return `WhereInTheWord #${PUZ} 📖\nFinal score: ${t}/1000 · ${rankFor(t)[1]}\n${location.origin}\n\n`+state.answers.map((a,i)=>`${i+1}️⃣ ${sq(a.s)} ${a.s.total}`).join('\n');
 }
 $('share').onclick=async()=>{
   const text=shareText(); SFX.tap();
