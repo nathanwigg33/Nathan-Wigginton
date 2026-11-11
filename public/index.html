@@ -257,8 +257,8 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
       <div class="kjv" id="tlabel">&nbsp;</div>
     </div>
     <div class="hints">
-      <button class="hbtn" id="h1">💡 Book clue <small>−10</small></button>
-      <button class="hbtn" id="h2" disabled>💡 Context clue <small>−20</small></button>
+      <button class="hbtn" id="h1">💡 Book clue <small>−20</small></button>
+      <button class="hbtn" id="h2" disabled>💡 Context clue <small>−40</small></button>
     </div>
     <div class="hintbox" id="hintbox"></div>
 
@@ -326,7 +326,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
     <tr><td>Right chapter <small style="color:var(--muted)">(partial if close)</small></td><td>60</td></tr>
     <tr><td>Right verse <small style="color:var(--muted)">(partial if close)</small></td><td>40</td></tr>
   </table>
-  <p>Stuck? Tap <b>💡 Book clue</b> (−10) for who wrote it and where it sits in the Bible, then <b>💡 Context clue</b> (−20) for what's happening in that part of the story.</p>
+  <p>Stuck? Tap <b>💡 Book clue</b> (−20) for a clue about the book, then <b>💡 Context clue</b> (−40) for what's happening in that part of the story.</p>
   <p style="color:var(--muted);font-size:13px">You only earn chapter points if you found the right book, and verse points only if you found the right chapter. Everyone gets the same five verses each day, and a new set comes out at midnight.</p>
   <button class="go" data-close>LET'S GO</button>
 </div></div>
@@ -366,7 +366,7 @@ const genreOf = b => GENRES.find(g=>b>=g.a&&b<=g.b);
 const TIERS = [
   {name:"Easy",lvl:1}, {name:"Easy",lvl:1}, {name:"Easy",lvl:1}, {name:"Medium",lvl:2}, {name:"Hard",lvl:3}
 ];
-const HINT_COST=[10,20];
+const HINT_COST=[20,40];
 const NKJV_NOTICE="Scripture taken from the New King James Version®. Copyright © 1982 by Thomas Nelson. Used by permission. All rights reserved.";
 const KJV_NOTICE="Scripture from the King James Version (public domain).";
 const RANKS = [
@@ -548,13 +548,14 @@ $('slotC').onclick=()=>{ if(!locked&&guess.b!=null){ $('sheetC').classList.add('
 $('slotV').onclick=()=>{ if(!locked&&guess.c!=null){ $('sheetV').classList.add('show'); $('sheetV').scrollIntoView({behavior:'smooth',block:'nearest'}); } };
 
 /* ---------- hints ---------- */
+function bookClue(q){ const a=D.bookHints[q.b]; if(typeof a==='string') return a; return a[(q.b*31+q.c*7+q.v*13)%a.length]; }
 function curHints(){ state.pending=state.pending||{}; return state.pending[qi]||0; }
 function renderHints(){
   const n=locked?(state.answers[qi]?.h||0):curHints(), q=QS[qi];
   $('h1').disabled=locked||n>=1; $('h2').disabled=locked||n!==1;
   $('h1').classList.toggle('used',n>=1); $('h2').classList.toggle('used',n>=2);
   const lines=[];
-  if(n>=1) lines.push(`<div class="hintline"><b>BOOK CLUE</b>${D.bookHints[q.b]}</div>`);
+  if(n>=1) lines.push(`<div class="hintline"><b>BOOK CLUE</b>${bookClue(q)}</div>`);
   if(n>=2) lines.push(`<div class="hintline"><b>CONTEXT CLUE</b>${D.chHints[q.b+':'+q.c]||'No context clue for this one.'}</div>`);
   $('hintbox').innerHTML=lines.join('');
 }
@@ -653,7 +654,7 @@ function showFinal(animate){
 }
 function shareText(){
   const t=total();
-  return `Chapter & Verse #${PUZ} 📖\n${t}/1000 · ${rankFor(t)[1]}\n\n`+state.answers.map((a,i)=>`${i+1}️⃣ ${sq(a.s)} ${a.s.total}`).join('\n')+`\n\n${location.host}`;
+  return `Chapter & Verse #${PUZ} 📖\nFinal score: ${t}/1000 · ${rankFor(t)[1]}\n${location.origin}\n\n`+state.answers.map((a,i)=>`${i+1}️⃣ ${sq(a.s)} ${a.s.total}`).join('\n');
 }
 $('share').onclick=async()=>{
   const text=shareText(); SFX.tap();
