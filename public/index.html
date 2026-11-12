@@ -259,8 +259,8 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
       <div class="kjv" id="tlabel">&nbsp;</div>
     </div>
     <div class="hints">
-      <button class="hbtn" id="h1">💡 Book clue <small>−20</small></button>
-      <button class="hbtn" id="h2" disabled>💡 Context clue <small>−40</small></button>
+      <button class="hbtn" id="h1">💡 Book clue <small>−15</small></button>
+      <button class="hbtn" id="h2" disabled>💡 Context clue <small>−15</small></button>
     </div>
     <div class="hintbox" id="hintbox"></div>
 
@@ -328,7 +328,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
     <tr><td>Right chapter <small style="color:var(--muted)">(partial if close)</small></td><td>60</td></tr>
     <tr><td>Right verse <small style="color:var(--muted)">(partial if close)</small></td><td>40</td></tr>
   </table>
-  <p>Stuck? Tap <b>💡 Book clue</b> (−20) for a clue about the book, then <b>💡 Context clue</b> (−40) for what's happening in that part of the story.</p>
+  <p>Stuck? Tap <b>💡 Book clue</b> (−15) for a clue about the book, or <b>💡 Context clue</b> (−15) for what's happening in that part of the story.</p>
   <p style="color:var(--muted);font-size:13px">You only earn chapter points if you found the right book, and verse points only if you found the right chapter. Everyone gets the same five verses each day, and a new set comes out at midnight.</p>
   <button class="go" data-close>LET'S GO</button>
 </div></div>
@@ -368,7 +368,7 @@ const genreOf = b => GENRES.find(g=>b>=g.a&&b<=g.b);
 const TIERS = [
   {name:"Easy",lvl:1}, {name:"Easy",lvl:1}, {name:"Easy",lvl:1}, {name:"Medium",lvl:2}, {name:"Hard",lvl:3}
 ];
-const HINT_COST=[20,40];
+const HINT_COST=[15,15];
 const NKJV_NOTICE="Scripture taken from the New King James Version®. Copyright © 1982 by Thomas Nelson. Used by permission. All rights reserved.";
 const KJV_NOTICE="Scripture from the King James Version (public domain).";
 const RANKS = [
